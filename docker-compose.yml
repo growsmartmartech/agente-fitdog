@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  agente-fitdog:
+    image: growsmartmartech/agente-fitdog:latest
+    container_name: agente_fitdog
+    ports:
+      - "8080:8080"           # ajuste se a aplicação expõe outra porta
+    environment:
+      - NODE_ENV=production     # ou development conforme o caso
+      - DB_HOST=db               # se existir banco no compose
+      - DB_PORT=5432             # ajustar conforme o banco usado
+      - DB_USER=admin
+      - DB_PASSWORD=1234
+      - DB_NAME=fitdog
+      # inclua outras variáveis de ambiente conforme o README do projeto
+    depends_on:
+      - db
+    volumes:
+      - ./logs:/app/logs         # se quiser persistir logs
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine     # ou o banco que o projeto usar
+    container_name: agente_fitdog_db
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=fitdog
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+networks:
+  default:
+    name: agente_fitdog_network
